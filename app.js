@@ -128,6 +128,41 @@ const deleteTour = (req, res)=>{
         data: null
     })
 }
+
+const getALLUsers = (req, res)=>{
+    res.status(500).json({                   // 500 for server internal error
+        status: "error",
+        message: "<this route is under construction...>"
+    })
+}
+
+const getOneUser = (req, res)=>{
+    res.status(500).json({                   // 500 for server internal error
+        status: "error",
+        message: "<this route is under construction...>"
+    })
+}
+
+const createNewUser = (req, res)=>{
+    res.status(500).json({                   // 500 for server internal error
+        status: "error",
+        message: "<this route is under construction...>"
+    })
+}
+
+const updateOneUser = (req, res)=>{
+    res.status(500).json({                   // 500 for server internal error
+        status: "error",
+        message: "<this route is under construction...>"
+    })
+}
+
+const deleteUser = (req, res)=>{
+    res.status(500).json({                   // 500 for server internal error
+        status: "error",
+        message: "<this route is under construction...>"
+    })
+}
 // app.get("/api/v1/tours", getAllTours)
 // app.post("/api/v1/tours", createNewTour)
 // app.get("/api/v1/tours/:id", getOneTour)
@@ -143,3 +178,12 @@ app.route("/api/v1/tours/:id")
    .get(getOneTour)
    .patch(updateTour)
    .delete(deleteTour)
+
+app.route("/api/v1/users")
+   .get(getALLUsers)
+   .post(createNewUser)
+
+app.route("/api/v1/users/:id")
+   .get(getOneUser)
+   .patch(updateOneUser)
+   .delete(deleteUser)
