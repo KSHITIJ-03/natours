@@ -1,5 +1,6 @@
 const express = require("express")
 const router = express.Router()
+const userController = require("./../controllers/userController")
 
 // using express.router to a way to organize your
 // Express application such that your primary app.js file does not become bloated 
@@ -7,52 +8,15 @@ const router = express.Router()
 
 // same as main application -> const app = express()
 
-const fs = require("fs")
-
-const getALLUsers = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const getOneUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const createNewUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const updateOneUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const deleteUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
 router
    .route("/")
-   .get(getALLUsers)
-   .post(createNewUser)
+   .get(userController.getALLUsers)
+   .post(userController.createNewUser)
 
 router
    .route("/:id")
-   .get(getOneUser)
-   .patch(updateOneUser)
-   .delete(deleteUser)
+   .get(userController.getOneUser)
+   .patch(userController.updateOneUser)
+   .delete(userController.deleteUser)
 
 module.exports = router

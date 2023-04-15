@@ -3,6 +3,8 @@ const fs = require("fs")
 const morgan = require("morgan")
 const app = express()
 
+module.exports = app
+
 const tourRouter = require("./routes/tourRoutes")
 const userRouter = require("./routes/userRoutes")
 
@@ -35,10 +37,6 @@ app.use((req, res, next) => {
 
 app.use(morgan("dev")) // it shows all the data of the api call eg:- url, code, time of reaction etc
 
-app.listen(3000, ()=>{
-    console.log("server running on port 3000");
-})
-
 // app.get("/", (req, res)=>{
 //     res.send("Hi from the server side")
 //     res.json({message: "server"})
@@ -59,5 +57,5 @@ app.listen(3000, ()=>{
 // Express application such that your primary app.js file does not become bloated 
 // and difficult to reason about. 
 
-app.use("/api/v1/tours", tourRouter) // work as middleware 
-app.use("/api/v1/users", userRouter) // work as middleware
+app.use("/api/v1/tours", tourRouter) // tourRouter work as middleware for this /api/v1/tours route
+app.use("/api/v1/users", userRouter) // userRouter work as middleware for this /api/v1/users route
