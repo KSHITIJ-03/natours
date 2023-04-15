@@ -8,6 +8,10 @@ const userController = require("./../controllers/userController")
 
 // same as main application -> const app = express()
 
+// special type of middleware that works on certain routes 
+
+//router.param("id", userController.checkID)
+
 router
    .route("/")
    .get(userController.getALLUsers)

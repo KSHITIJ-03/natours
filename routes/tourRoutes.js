@@ -10,12 +10,20 @@ const tourController = require("./../controllers/tourController")
 // here we are creating a sub application which takes "/api/v1/tours" as "/" and instead of app
 // we will be using tourRouter as our new sub application
 
+router.param("id", tourController.checkID)
+
+// either define the middleware with its whole structure like 
+// (req, res, next) function
+
+// or just use like app.use("....", ....) 
+
+
 router
    .route("/")
    .get(tourController.getAllTours)    // this shows that getAllTours is a function of tourController, which is a module that is imported
                                        // it can also written as const {getAllTours, createNewTour, getOneTour, updateTour, deleteTour} = 
                                        // require("./../controllers/tourController")
-   .post(tourController.createNewTour)
+   .post(tourController.checkBody, tourController.createNewTour)
 
 router
    .route("/:id")
