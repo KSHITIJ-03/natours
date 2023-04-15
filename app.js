@@ -3,6 +3,9 @@ const fs = require("fs")
 const morgan = require("morgan")
 const app = express()
 
+const tourRouter = require("./routes/tourRoutes")
+const userRouter = require("./routes/userRoutes")
+
 app.use(express.json())  // middleware
 
 // making new my middleware :- custom functions that passes (req, res) within itself to manipulate them 
@@ -44,146 +47,17 @@ app.listen(3000, ()=>{
 // app.post("/", (req, res)=>{
 //     res.send("hello")
 // })
-
-const tours = JSON.parse(fs.readFileSync(__dirname + "/dev-data/data/tours-simple.json"))
-
-const getAllTours = (req, res)=>{
-    console.log(req.requestTime);
-    res.status(200).json({
-        status: "success",
-        results: tours.length,
-        request_made_at: req.requestTime, 
-        data: {
-            tours: tours
-        }
-    })
-    console.log(tours);
-}
-
-const createNewTour = (req, res)=>{
-    const newTour = req.body
-    console.log(newTour);
-    const id = tours[tours.length - 1].id + 1
-    const obj = Object.assign({id: id}, newTour)    // assigning another field to the object
-    tours.push(obj)
-    fs.writeFile(__dirname + "/dev-data/data/tours-simple.json", JSON.stringify(tours), err=>{
-        if(err) console.log(err);
-        else{
-            res.status(201).json({
-                status: "success",
-                data: {
-                    tours: obj
-                }
-            })
-        }
-    })
-}
-
-const getOneTour = (req, res)=>{
-    // params make a object of all the parameters/variables of url
-    //const tours = JSON.parse(__dirname + "/dev-data/data/tours-simple.json")
-    const id = req.params.id * 1
-    if(id > tours.length){
-        return res.status(404).json({
-            status: "fail",
-            message: "invalid id"
-        })
-    }
-    const tour = tours.find(el => el.id === id)
-    res.status(200).json({
-        status: "success",
-        data : {
-            tours: tour
-        }
-    })
-}
-
-const updateTour = (req, res)=>{
-    const id = req.params.id * 1                 // converting it to number
-    const tour = tours.find(el => el.id === id)  // it returns true or false
-    if(!tour){
-        return res.status(404).json({
-            status: "fail",
-            message: "invalid id"
-        })
-    }
-        res.status(200).json({
-            status: "success",
-            message: "<tour updated here...>"
-        })
-}
-
-const deleteTour = (req, res)=>{
-    const id = req.params.id * 1
-    const tour = tours.find(el => el.id === id)
-    if(!tour){
-        res.status(404).json({
-            status: "fail",
-            message: "invalid id"
-        })
-    }
-    res.status(204).json({
-        status: "success",
-        message: "tour deleted successfully",
-        data: null
-    })
-}
-
-const getALLUsers = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const getOneUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const createNewUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const updateOneUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
-
-const deleteUser = (req, res)=>{
-    res.status(500).json({                   // 500 for server internal error
-        status: "error",
-        message: "<this route is under construction...>"
-    })
-}
 // app.get("/api/v1/tours", getAllTours)
 // app.post("/api/v1/tours", createNewTour)
 // app.get("/api/v1/tours/:id", getOneTour)
 // app.patch("/api/v1/tours/:id", updateTour)
 // app.delete("/api/v1/tours/:id", deleteTour)
+////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+// using express.router to a way to organize your
+// Express application such that your primary app.js file does not become bloated 
+// and difficult to reason about. 
 
-
-app.route("/api/v1/tours")
-   .get(getAllTours)
-   .post(createNewTour)
-
-app.route("/api/v1/tours/:id")
-   .get(getOneTour)
-   .patch(updateTour)
-   .delete(deleteTour)
-
-app.route("/api/v1/users")
-   .get(getALLUsers)
-   .post(createNewUser)
-
-app.route("/api/v1/users/:id")
-   .get(getOneUser)
-   .patch(updateOneUser)
-   .delete(deleteUser)
+app.use("/api/v1/tours", tourRouter) // work as middleware 
+app.use("/api/v1/users", userRouter) // work as middleware
