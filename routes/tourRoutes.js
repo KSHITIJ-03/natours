@@ -11,7 +11,7 @@ const tourController = require('../controllers/tourController');
 // here we are creating a sub application which takes "/api/v1/tours" as "/" and instead of app
 // we will be using tourRouter as our new sub application
 
-router.param('id', tourController.checkID); // middleware that works on a routes with some special params
+// router.param('id', tourController.checkID); // middleware that works on a routes with some special params
 
 // either define the middleware with its whole structure like
 // (req, res, next) function
