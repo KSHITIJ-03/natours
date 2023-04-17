@@ -23,7 +23,7 @@ router
   .get(tourController.getAllTours) // this shows that getAllTours is a function of tourController, which is a module that is imported
   // it can also written as const {getAllTours, createNewTour, getOneTour, updateTour, deleteTour} =
   // require("./../controllers/tourController")
-  .post(tourController.checkBody, tourController.createNewTour); // middleware added to check
+  .post(/*tourController.checkBody,*/ tourController.createNewTour); // middleware added to check
 // valid tour body
 
 router

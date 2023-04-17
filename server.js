@@ -11,9 +11,10 @@ mongoose.connect(DB, {
   // useCreateIndex: true,
   // useFindAndModify: false
 }).then(con=>{
-  console.log(con.connections);
+  //console.log(con.connections);
   console.log("db connection succcessful!");
 })
+
 // console.log(process.env);
 
 const port = 3000 || process.env.PORT;
