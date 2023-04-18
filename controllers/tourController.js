@@ -1,5 +1,6 @@
 const fs = require('fs');
-const Tour = require("./../models/tourModels")
+const Tour = require("./../models/tourModels");
+const { Query } = require('mongoose');
 
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -47,7 +48,54 @@ exports.getAllTours = async (req, res) => {
   // });
   // console.log(tours);
   try{
-    const tours = await Tour.find()
+    //console.log(req.query);
+    // some of the querry is not required in the url otherwise they will not give the suitable result
+    // to remove them we have to make a hard copy of req.query object
+    // since in js if we use const a = b then a will be a reference to b an changes in b will let changes in a
+    // therefore we have to destructure the object req.query means all the fields will be loosen and tied again
+    // this is done by ...objectname and to make it object again {...objectname}
+    const query = req.query
+    const newQuery = {...query}
+    //console.log(newQuery);
+
+    // { duration: { gte: '5' }, difficulty: 'easy' } => by the req.query
+    // { duration: { $gte: "5" }, difficulty: "easy" } => standard way to put the filters in mongoDB find method
+    
+    const toDeleteQuery = ["page", "sort", "limit", "fields"]
+    toDeleteQuery.forEach(el => delete newQuery[el])
+    //const tours = await Tour.find(newQuery)
+    
+    // advanced filtering
+
+    let queryStr = JSON.stringify(newQuery) // let is used to mutate the data
+
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match=> "$" + match)
+    //console.log(JSON.parse(queryStr));
+
+    // sorting
+    let temp_tours = Tour.find(JSON.parse(queryStr))
+    
+    if(req.query.sort){
+      console.log(req.query.sort);
+      // const sortBy = req.query.sort.split(",").join(" ")
+      temp_tours.sort(req.query.sort)
+      // sort("price ratingAverage) if sort by price is tied then sort by second field
+    } else{
+      temp_tours.sort("createdAt")
+    }
+    // field limiting // projection of only certain fields
+    if(req.query.fields){
+      console.log(req.query.fields);
+      const fields = req.query.fields.split(",").join(" ")
+      //console.log(fields);
+      temp_tours = temp_tours.select(fields)
+    } else{
+      temp_tours = temp_tours.select("-__v") // this __v attribute is used by mongoDB internally for its functions
+    }
+    const tours = await temp_tours
+    //const tours = await Tour.find(req.query)
+    // const tours = await Tour.find().where("duration").equals(5).where("difficulty").equals("easy")
+    // .equals or .lte or .lt etc ...
     res.status(200).json({
     status: "success",
     results: tours.length,
@@ -97,7 +145,7 @@ exports.createNewTour = async (req, res) => {
   })
   }catch(err){  // err will generally come if promise is rejected or the newTour created 
                 // contains bad items
-    res.send(400).json({
+    res.status(400).json({
       status: "fail",
       message: err
     })
@@ -117,7 +165,8 @@ exports.getOneTour = async (req, res) => {
   //   }
   // });
   try{
-    const tour = await Tour.findById(req.params.id)
+    const filters = req.query
+    const tour = await Tour.findById(filters)
     res.status(200).json({
       status: "success",
       data: {
@@ -154,7 +203,7 @@ exports.updateTour = async (req, res) => {
 
 exports.deleteTour = async (req, res) => {
   try{
-    const tour = await Tour.deleteOne({_id: req.body.id})
+    await Tour.deleteOne({_id: req.params.id})
     res.status(204).json({
       status: "success",
       data: null
