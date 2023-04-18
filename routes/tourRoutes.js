@@ -2,6 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const tourController = require('../controllers/tourController');
+const Tour = require('../models/tourModels');
 //const {getAllTours, createNewTour, getOneTour, updateTour, deleteTour} = require("./../controllers/tourController")
 
 // using express.router to a way to organize your
@@ -17,6 +18,10 @@ const tourController = require('../controllers/tourController');
 // (req, res, next) function
 
 // or just use like app.use("....", ....)
+
+router
+  .route("/top-5-tours")
+  .get(tourController.topFiveTours, tourController.getAllTours)
 
 router
   .route('/')

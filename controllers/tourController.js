@@ -36,6 +36,24 @@ const { Query } = require('mongoose');
 //   next();
 // };
 
+exports.topFiveTours = async (req, res, next) =>{
+  try{
+    // in this middleware i will just set the limit to 5 ang skip to 0 so that top 5 cheapest tours can be found
+    // i will set the req.query.sort to ratingsAverage,price
+    req.query.sort = "-ratingAverage, price"
+    // req.query.page = 0
+    //req.query.skip = 0
+    req.query.limit = 5
+    req.query.fields = "name, ratingAverage, price, summary, difficulty"
+  } catch(err){
+    res.status(404).json({
+      status: "fail",
+      message: err
+    })
+  }
+  next()                   ///// with these updation the updated querry values will be pased to next middleware ////
+}
+
 exports.getAllTours = async (req, res) => {
   // console.log(req.requestTime);
   // res.status(200).json({
@@ -66,7 +84,6 @@ exports.getAllTours = async (req, res) => {
     //const tours = await Tour.find(newQuery)
     
     // advanced filtering
-
     let queryStr = JSON.stringify(newQuery) // let is used to mutate the data
 
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match=> "$" + match)
@@ -76,21 +93,35 @@ exports.getAllTours = async (req, res) => {
     let temp_tours = Tour.find(JSON.parse(queryStr))
     
     if(req.query.sort){
-      console.log(req.query.sort);
+      //console.log(req.query.sort);
       // const sortBy = req.query.sort.split(",").join(" ")
       temp_tours.sort(req.query.sort)
-      // sort("price ratingAverage) if sort by price is tied then sort by second field
+      // sort("price ratingAverage") if sort by price is tied then sort by second field
     } else{
       temp_tours.sort("createdAt")
     }
+
     // field limiting // projection of only certain fields
     if(req.query.fields){
-      console.log(req.query.fields);
+      //console.log(req.query.fields);
       const fields = req.query.fields.split(",").join(" ")
       //console.log(fields);
       temp_tours = temp_tours.select(fields)
     } else{
       temp_tours = temp_tours.select("-__v") // this __v attribute is used by mongoDB internally for its functions
+    }
+    // paging => if the documents are on many pages then page=2&limit=10 means that url wants to show page no. 2 and on each page 
+    // ......... there should be 10 documents eg total 1000 documents if limit=10&page=3 then on each page there should be 10 documents
+    // ......... we therefore total 100 pages and we want its page no 3
+    const page = req.query.page*1 || 1
+    const limit = req.query.limit*1 || 100
+    const skip = (page - 1)*limit
+    temp_tours = temp_tours.skip(skip).limit(limit)
+    if(req.query.page){
+      const numTours = await Tour.countDocumnets()
+      if(skip >= numTours){
+        throw new Error("This page does not exist")
+      }
     }
     const tours = await temp_tours
     //const tours = await Tour.find(req.query)
