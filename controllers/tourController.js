@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Tour = require("./../models/tourModels");
-const { Query } = require('mongoose');
+const mongoose = require('mongoose');
 
 // const tours = JSON.parse(
 //   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
@@ -240,10 +240,106 @@ exports.deleteTour = async (req, res) => {
       data: null
     })
   }catch(err){
-    res.send(404).json({
+    res.status(404).json({
       status: "fail",
       message: err
     })
   }
   
 };
+
+
+///////////////////// pipeline /////////////////////////////
+
+//// the aggregate functions go from one to other fuctions as follows :-
+//// pipeline means array of functions, the data from one function is returned to the next functions which are in array known as pipeline
+exports.getTourStats = async(req, res) =>{
+  try{
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingAverage: { $gte: 4.5}}
+      },
+      {
+        $group: {
+          //_id: null,  // 
+           _id: {$toUpper: "$difficulty"},
+           numTours: {$sum: 1}, // total number of  tours in a group of _id: difficulty
+           numRatings: {$sum: "$ratingsQuantity"},
+           avgRating: {$avg: "$ratingAverage"},
+           avgPrice: {$avg: "$price"},
+           minPrice: {$min: "$price"},
+           maxPrice: {$max: "$price"}
+        },  
+      },
+      {
+        $sort: {avgPrice: 1} // sort by avgPrice
+      } 
+    ])
+    res.status(200).json({
+      status: "success",
+      data: {
+        stats: stats
+      }
+    })
+  } catch(err){
+    res.status(404).json({
+      status: "fail",
+      message: err
+    })
+  }
+}
+// toDeleteQuery.forEach(el => delete newQuery[el])
+exports.getMonthyPlan = async(req, res)=>{
+  try{
+    const year = req.params.year*1
+    const stats = await Tour.aggregate([
+      {
+        $unwind: "$startDates"
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(year+"-01-01"),
+            $lte: new Date(year+"-12-31")
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $month : "$startDates"
+          },
+          $numTourStarts: {
+            $sum: 1
+          },
+          $tours: {
+            $push: "$name"
+          }
+        },
+      },
+      {
+        $addFields: {month: $_id}
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      },
+      {
+        $sort: {numTourStarts}
+      }
+    ])
+    res.status(200).json({
+      status: "success",
+      data: {
+        stats
+      }
+    })
+  } catch(err){
+    res.status(404).json({
+      status: "fail",
+      message: err
+    })
+  }
+}
+

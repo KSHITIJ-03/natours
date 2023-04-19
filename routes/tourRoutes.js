@@ -20,9 +20,14 @@ const Tour = require('../models/tourModels');
 // or just use like app.use("....", ....)
 
 router
+  .route("/tour-Stats")
+  .get(tourController.getTourStats)
+router
   .route("/top-5-tours")
   .get(tourController.topFiveTours, tourController.getAllTours)
-
+router
+  .route("/get-monthly-plan/:year")
+  .get(tourController.getMonthyPlan)
 router
   .route('/')
   .get(tourController.getAllTours) // this shows that getAllTours is a function of tourController, which is a module that is imported

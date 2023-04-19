@@ -50,8 +50,10 @@ const tourSchema = new mongoose.Schema({
         default: Date.now(),
         select: false   // this attribute will be hiddden from the client
     },
-    startDated: [Date]
+    startDates: [Date]
 })
+
+
 
 const Tour = mongoose.model("Tour", tourSchema)
 
