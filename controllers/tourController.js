@@ -196,7 +196,7 @@ exports.getOneTour = async (req, res) => {
   //   }
   // });
   try{
-    const filters = req.query
+    const filters = req.params.id
     const tour = await Tour.findById(filters)
     res.status(200).json({
       status: "success",
