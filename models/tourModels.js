@@ -1,11 +1,15 @@
 const mongoose = require("mongoose")
 const slugify = require("slugify")
+const validator = require("validators")
 const tourSchema = new mongoose.Schema({
     name: {
         type: String,
         unique: true,
         required: [true, "A tour must have a name"],
-        trim: true
+        trim: true,
+        minLength: [10, "A tour must have length more than 10"],
+        maxLength: [40, "A tour must have length less than 40"],
+        //validate: [validator.isAlpha, "A tour must contain only alphabets"]
     },
     duration: {
         type: Number,
@@ -17,11 +21,17 @@ const tourSchema = new mongoose.Schema({
     },
     difficulty: {
         type: String,
-        required: [true, "A tour must have a diffculty"]
+        required: [true, "A tour must have a diffculty"],
+        enum: {
+            values: ["easy", "medium", "difficult"],
+            message: "A tour can only be easy, medium or difficult"
+        }
     },
     ratingAverage: {
         type: Number,
-        default: 4.5
+        default: 4.5,
+        min: [1, "A rating must be greater then 1.0"],
+        max: [5, "A rating must be less then 5.0"]
     },
     ratingQuantity: {
         type: Number,
@@ -31,7 +41,27 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         required: [true, "A tour must have a number"]
     },
-    priceDiscount: Number,
+    ////////////////////////////////////   making buil in validator to check weather priceDiscount is less then price or not
+    ////////////////////////////////////   a validate property is used which have a real callback funtion returns true ot false
+    ////////////////////////////////////   function will have this operator which will point to the current document
+    priceDiscount:{ 
+        type: Number,
+        // validate: function(val){
+        //     return val < this.price
+        // }
+
+        // with message
+        
+        // this can be done by the array method [ validator, message ]
+        // this validator function is not going to work on update
+        // only works for new documents created
+        validate: {
+            validator: function(val){
+                return val < this.price
+            },
+            message: "discount price should be less then price"
+        }
+    },
     summary: {
         type: String,
         trim: true
