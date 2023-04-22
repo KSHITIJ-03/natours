@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const slugify = require("slugify")
-const validator = require("validators")
+const validator = require("validator")
 const tourSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -9,7 +9,7 @@ const tourSchema = new mongoose.Schema({
         trim: true,
         minLength: [10, "A tour must have length more than 10"],
         maxLength: [40, "A tour must have length less than 40"],
-        //validate: [validator.isAlpha, "A tour must contain only alphabets"]
+        validate: [validator.isAlpha, "A tour must contain only alphabets"]
     },
     duration: {
         type: Number,
@@ -41,7 +41,7 @@ const tourSchema = new mongoose.Schema({
         type: Number,
         required: [true, "A tour must have a number"]
     },
-    ////////////////////////////////////   making buil in validator to check weather priceDiscount is less then price or not
+    ////////////////////////////////////   making built in validator to check weather priceDiscount is less then price or not
     ////////////////////////////////////   a validate property is used which have a real callback funtion returns true ot false
     ////////////////////////////////////   function will have this operator which will point to the current document
     priceDiscount:{ 
