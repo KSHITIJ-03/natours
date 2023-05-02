@@ -1,5 +1,5 @@
 const express = require('express');
-
+const authController = require("./../controllers/authController")
 const router = express.Router();
 const tourController = require('../controllers/tourController');
 const Tour = require('../models/tourModels');
@@ -30,7 +30,7 @@ router
   .get(tourController.getMonthyPlan)
 router
   .route('/')
-  .get(tourController.getAllTours) // this shows that getAllTours is a function of tourController, which is a module that is imported
+  .get(authController.protect, tourController.getAllTours) // this shows that getAllTours is a function of tourController, which is a module that is imported
   // it can also written as const {getAllTours, createNewTour, getOneTour, updateTour, deleteTour} =
   // require("./../controllers/tourController")
   .post(/*tourController.checkBody,*/ tourController.createNewTour); // middleware added to check

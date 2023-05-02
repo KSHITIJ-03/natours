@@ -76,3 +76,17 @@ exports.login = async (req, res, next) =>{
     })
     next()
 }
+
+// 1) getting token and check of it's there
+// 2) verification of token
+// 3) check if user still exists
+// 4) check if user changed password after the token was issued
+
+exports.protect = async (req, res, next) =>{
+    try{
+        next()
+    } catch(err){
+        console.log(err)
+        next()
+    }
+}
